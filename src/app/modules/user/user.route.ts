@@ -20,6 +20,7 @@ router.get(
 
 router.patch(
   "/:id",
+  validateRequest(createZodSchema),
   checkAuth(...Object.values(Role)),
   userControllers.updateUser
 );
