@@ -33,7 +33,6 @@ export const globalErrorHandler = (
     statusCode = simplifiedError.statusCode as number;
     message = simplifiedError.message;
   } else if (err.name === "ValidationError") {
-    console.log("I was here");
     const simplifiedError = handleValidationError(err);
     statusCode = simplifiedError.statusCode as number;
     message = simplifiedError.message;
@@ -45,12 +44,11 @@ export const globalErrorHandler = (
     statusCode = 500;
     message = err.message;
   }
-
   res.status(statusCode).json({
     success: false,
     message: message,
     errorSources,
-    err,
+    err: envVars.NODE_ENV === "development" ? err : null,
     stack: envVars.NODE_ENV === "development" ? err.stack : null,
   });
 };
