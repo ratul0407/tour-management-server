@@ -9,10 +9,37 @@ import { setAuthCookie } from "../../utils/setCookie";
 import { createUserTokens } from "../../utils/userTokens";
 import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import passport from "passport";
 
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const loginInfo = await AuthServices.credentialsLogin(req.body);
+    // const loginInfo = await AuthServices.credentialsLogin(req.body);
+
+    passport.authenticate("local", async (error: any, user: any, info: any) => {
+      if (error) {
+        console.log("from errs");
+        return next(new AppError(401, error));
+      }
+
+      if (!user) {
+        console.log("from not user");
+        return next(new AppError(401, info.message));
+      }
+      const userTokens = createUserTokens(user);
+
+      delete user.toObject().password;
+      setAuthCookie(res, userTokens);
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: "Login Successful!",
+        data: {
+          accessToken: userTokens.accessToken,
+          refreshToken: userTokens.refreshToken,
+          user,
+        },
+        success: true,
+      });
+    })(req, res, next);
     // res.cookie("accessToken", loginInfo.accessToken, {
     //   httpOnly: true,
     //   secure: false,
@@ -21,13 +48,6 @@ const credentialsLogin = catchAsync(
     //   httpOnly: true,
     //   secure: false,
     // });
-    setAuthCookie(res, loginInfo);
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      message: "Login Successful!",
-      data: loginInfo,
-      success: true,
-    });
   }
 );
 

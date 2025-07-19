@@ -15,16 +15,16 @@ export const createZodSchema = z.object({
     .max(36, { message: "Email is too long" }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters long" })
-    .regex(/^(?=.*[A-Z])/, {
-      message: "Password must contain at least 1 uppercase letter.",
-    })
-    .regex(/^(?=.*[!@#$%^&*])/, {
-      message: "Password must contain at least 1 special character.",
-    })
-    .regex(/^(?=.*\d)/, {
-      message: "Password must contain at least 1 number",
-    }),
+    .min(8, { message: "Password must be at least 8 characters long" }),
+  // .regex(/^(?=.*[A-Z])/, {
+  //   message: "Password must contain at least 1 uppercase letter.",
+  // })
+  // .regex(/^(?=.*[!@#$%^&*])/, {
+  //   message: "Password must contain at least 1 special character.",
+  // })
+  // .regex(/^(?=.*\d)/, {
+  //   message: "Password must contain at least 1 number",
+  // }),
   phone: z
     .string({ invalid_type_error: "Phone number must be a string" })
     .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
@@ -36,6 +36,7 @@ export const createZodSchema = z.object({
     .string({ invalid_type_error: "Address must be a string" })
     .max(200, { message: "Address cannot exceed 200 characters" })
     .optional(),
+  IsActive: z.boolean(),
 });
 
 export const updateZodSchema = z.object({

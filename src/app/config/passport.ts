@@ -7,7 +7,44 @@ import {
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
 import { Role } from "../modules/user/user.interface";
+import { Strategy as LocalStrategy } from "passport-local";
+import bcryptjs from "bcryptjs";
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    async (email: string, password: string, done) => {
+      try {
+        const isUserExists = await User.findOne({ email });
+        if (!isUserExists) {
+          return done("User does not exist");
+        }
+        const isGoogleAuthenticated = isUserExists.auths.some(
+          (providerObjects) => providerObjects.provider === "google"
+        );
+        if (isGoogleAuthenticated && !isUserExists.password) {
+          return done(
+            "You have authenticated with google. If you want to login with password, first login with google and then set a password to login with a password for next time"
+          );
+        }
+        const isPasswordMatched = bcryptjs.compare(
+          password as string,
+          isUserExists.password as string
+        );
 
+        if (!isPasswordMatched) {
+          return done(null, false, { message: "Password does not match" });
+        }
+        return done(null, isUserExists);
+      } catch (error) {
+        console.log(error);
+        done(error);
+      }
+    }
+  )
+);
 passport.use(
   new GoogleStrategy(
     {
@@ -58,7 +95,8 @@ passport.serializeUser(
     done(null, user?._id);
   }
 );
-passport.deserializeUser(async (id: string, done: any) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await User.findById(id);
     done(null, user);
