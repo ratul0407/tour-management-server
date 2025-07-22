@@ -18,7 +18,10 @@ const createTour = catchAsync(
 
 const getAllTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await TourService.getAllTours();
+    const query = req.query;
+    const result = await TourService.getAllTours(
+      query as Record<string, string>
+    );
     sendResponse(res, {
       statusCode: 201,
       success: true,
@@ -43,6 +46,7 @@ const updateTour = catchAsync(
 const deleteTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
+    console.log(id);
     const result = await TourService.deleteTour(id);
     sendResponse(res, {
       statusCode: 201,
@@ -92,6 +96,7 @@ const updateTourType = catchAsync(
 const deleteTourType = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
+    console.log(id);
     const result = await TourService.deleteTourType(id);
     sendResponse(res, {
       statusCode: 201,
