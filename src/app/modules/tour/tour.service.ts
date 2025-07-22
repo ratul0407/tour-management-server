@@ -89,6 +89,10 @@ const updateTourType = async (id: string, payload: ITourType) => {
   });
   return updatedTour;
 };
+const deleteTourType = async (id: string) => {
+  await TourType.findByIdAndDelete(id);
+  return null;
+};
 export const TourService = {
   createTour,
   getAllTours,
@@ -97,4 +101,5 @@ export const TourService = {
   createTourType,
   getAllTourType,
   updateTourType,
+  deleteTourType,
 };
