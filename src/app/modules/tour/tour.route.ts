@@ -11,10 +11,31 @@ import { Role } from "../user/user.interface";
 
 const router = Router();
 
+/// ----------- Tour Type Route --------------
+router.get("/tour-types");
+router.post("/create-tour-type");
+router.patch("/tour-type/:id");
+router.delete("/tour-type/:id");
+
+//------------------- Tour Route ---------------
+router.get("/");
 router.post(
   "/create",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   validateRequest(createTourZodSchema),
   TourController.createTour
+);
+router.patch(
+  "/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  validateRequest(updateTourZodSchema),
+  TourController.updateTour
+);
+
+router.delete(
+  "/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  TourController.deleteTour
 );
 // router.post(
 //   "/craete-tour-type",
