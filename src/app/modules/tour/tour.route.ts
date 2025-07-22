@@ -12,13 +12,34 @@ import { Role } from "../user/user.interface";
 const router = Router();
 
 /// ----------- Tour Type Route --------------
-router.get("/tour-types");
-router.post("/create-tour-type");
-router.patch("/tour-type/:id");
-router.delete("/tour-type/:id");
+router.get(
+  "/tour-types",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  TourController.getAllTourType
+);
+router.post(
+  "/create-tour-type",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  validateRequest(createTourTypeZodSchema),
+  TourController.createTourType
+);
+router.patch(
+  "/tour-type/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  TourController.updateTourType
+);
+router.delete(
+  "/tour-type/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  TourController.deleteTourType
+);
 
 //------------------- Tour Route ---------------
-router.get("/");
+router.get(
+  "/",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  TourController.getAllTour
+);
 router.post(
   "/create",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
@@ -37,31 +58,5 @@ router.delete(
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   TourController.deleteTour
 );
-// router.post(
-//   "/craete-tour-type",
-//   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-//   validateRequest(createTourTypeZodSchema),
-//   TourController.createTourType
-// );
-// router.get("/tour-types", TourController.getAllYourTourTypes);
-// router.patch(
-//   "/tour-types/:id",
-//   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-//   validateRequest(Role.ADMIN, Role.SUPER_ADMIN),
-//   TourController.updateTourType
-// );
-// router.delete(
-//   "/tour-types/:id",
-//   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-//   TourController.deleteTourType
-// );
-// router.patch(
-//   "/:id",
-//   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-//   validateRequest(updateTourZodSchema),
-//   TourController.updateTour
-// );
-// router.delete(
-"/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.deleteTour;
-// );
+
 export const TourRoutes = router;
