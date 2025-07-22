@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
+import { tourSearchableFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 
@@ -6,27 +8,46 @@ const createTour = async (payload: ITour) => {
   if (existingTour) {
     throw new Error("A tour with this title already exists");
   }
-  const baseSlug = payload.title.toLowerCase().split(" ").join("-");
-  let slug = `${baseSlug}-division`;
-
-  let counter = 0;
-  while (await Tour.exists({ slug })) {
-    slug = `${slug}-${counter++}`;
-  }
-
-  payload.slug = slug;
   const tour = await Tour.create(payload);
   return tour;
 };
 
-const getAllTours = async () => {
-  const tours = await Tour.find({});
+const getAllTours = async (query: Record<string, string>) => {
+  const filter = query;
+  const searchTerm = query.searchTerm || "";
+  const sort = query.sort || "-createdAt";
+  const fields = query.fields?.split(",").join(" ") || "";
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+  console.log(skip, limit);
+  const excludedFields = ["searchTerm", "sort", "fields", "page", "limit"];
+
+  for (const field of excludedFields) {
+    delete filter[field];
+  }
+  const searchQuery = {
+    $or: tourSearchableFields.map((field) => ({
+      [field]: { $regex: searchTerm, $options: "i" },
+    })),
+  };
+  console.log(filter);
+  const tours = await Tour.find(searchQuery)
+    .find(filter)
+    .sort(sort)
+    .select(fields)
+    .skip(skip)
+    .limit(limit);
   const totalTours = await Tour.countDocuments();
+  const meta = {
+    page,
+    limit,
+    totalTours,
+    totalPage: Math.ceil(totalTours / limit),
+  };
   return {
     data: tours,
-    meta: {
-      totalTours,
-    },
+    meta,
   };
 };
 const updateTour = async (id: string, payload: Partial<ITour>) => {
@@ -35,15 +56,6 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
     throw new Error("Tour doesn't exist");
   }
 
-  if (payload.title) {
-    const baseSlug = payload.title.toLowerCase().split(" ").join("-");
-    let slug = `${baseSlug}-division`;
-    let counter = 0;
-    while (await Tour.exists({ slug })) {
-      slug = `${slug}-${counter++}`;
-    }
-    payload.slug = slug;
-  }
   const updatedTour = await Tour.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
@@ -53,35 +65,31 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
 };
 
 const deleteTour = async (id: string) => {
-  await Tour.findById(id);
+  await Tour.findByIdAndDelete(id);
   return null;
 };
 
 /// --------------- Tour Type ---------------------
 const createTourType = async (payload: ITourType) => {
-  const existingTourType = await TourType.findOne({ name: payload });
+  const name = payload.name;
+  const existingTourType = await TourType.findOne({ name });
   if (existingTourType) {
     throw new Error("This tour type already exists");
   }
-  const result = TourType.create(payload);
+  const result = TourType.create({ name });
   return result;
 };
 
 const getAllTourType = async () => {
-  const tourTypes = await TourType.find({});
-  const totalTourTypes = await TourType.countDocuments();
-  return {
-    data: tourTypes,
-    meta: {
-      totalTourTypes,
-    },
-  };
+  return await TourType.find({});
 };
 
 const updateTourType = async (id: string, payload: ITourType) => {
-  const existingTourType = await TourType.find({ name: payload });
-  if (existingTourType) {
-    throw new Error("This tour type already exists");
+  console.log(payload);
+  const existingTourType = await TourType.findById(id);
+  console.log(existingTourType);
+  if (!existingTourType) {
+    throw new Error("Tour Type was not Found!");
   }
   const updatedTour = await TourType.findByIdAndUpdate(id, payload, {
     new: true,
@@ -90,6 +98,7 @@ const updateTourType = async (id: string, payload: ITourType) => {
   return updatedTour;
 };
 const deleteTourType = async (id: string) => {
+  console.log(id);
   await TourType.findByIdAndDelete(id);
   return null;
 };
