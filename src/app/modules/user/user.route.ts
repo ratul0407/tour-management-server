@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { userControllers } from "./user.controller";
-import { createZodSchema } from "./user.validation";
+import { createZodSchema, updateUserZodSchema } from "./user.validation";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { checkAuth } from "../../middlewares/checkAuth";
 import { Role } from "./user.interface";
@@ -20,7 +20,7 @@ router.get(
 
 router.patch(
   "/:id",
-  validateRequest(createZodSchema),
+  validateRequest(updateUserZodSchema),
   checkAuth(...Object.values(Role)),
   userControllers.updateUser
 );
