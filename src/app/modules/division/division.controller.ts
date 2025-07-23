@@ -15,7 +15,10 @@ const createDivision = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllDivisions = catchAsync(async (req: Request, res: Response) => {
-  const result = await DivisionService.getAllDivisions();
+  const query = req.query;
+  const result = await DivisionService.getAllDivisions(
+    query as Record<string, string>
+  );
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -26,6 +29,7 @@ const getAllDivisions = catchAsync(async (req: Request, res: Response) => {
 });
 const getSingleDivision = catchAsync(async (req: Request, res: Response) => {
   const slug = req.params.slug;
+
   const result = await DivisionService.getSingleDivision(slug);
   sendResponse(res, {
     statusCode: 200,

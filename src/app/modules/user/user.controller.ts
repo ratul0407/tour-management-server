@@ -23,7 +23,10 @@ const createUser = catchAsync(
 
 const getAllUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await userServices.getAllUsers();
+    const query = req.query;
+    const result = await userServices.getAllUsers(
+      query as Record<string, string>
+    );
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
