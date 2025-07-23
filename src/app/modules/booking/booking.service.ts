@@ -75,6 +75,10 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
   }
 };
 
+const getAllBookings = async () => {
+  return {};
+};
 export const bookingService = {
   createBooking,
+  getAllBookings,
 };

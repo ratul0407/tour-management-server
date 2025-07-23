@@ -17,6 +17,10 @@ interface envConfig {
   GOOGLE_CALLBACK_URL: string;
   EXPRESS_SESSION_SECRET: string;
   FRONTEND_URL: string;
+  SSL_STORE_ID: string;
+  SSL_STORE_PASSWORD: string;
+  SSL_PAYMENT_API: string;
+  SSL_VALIDATION_API: string;
 }
 
 const loadEnvVariables = (): envConfig => {
@@ -36,6 +40,10 @@ const loadEnvVariables = (): envConfig => {
     "GOOGLE_CALLBACK_URL",
     "EXPRESS_SESSION_SECRET",
     "FRONTEND_URL",
+    "SSL_STORE_ID",
+    "SSL_STORE_PASSWORD",
+    "SSL_PAYMENT_API",
+    "SSL_VALIDATION_API",
   ];
   requiredEnvVariables.forEach((key) => {
     if (!process.env[key]) {
@@ -58,6 +66,10 @@ const loadEnvVariables = (): envConfig => {
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
     FRONTEND_URL: process.env.FRONTEND_URL as string,
+    SSL_STORE_ID: process.env.SSL_STORE_ID as string,
+    SSL_STORE_PASSWORD: process.env.SSL_STORE_PASSWORD as string,
+    SSL_PAYMENT_API: process.env.SSL_PAYMENT_API as string,
+    SSL_VALIDATION_API: process.env.SSL_VALIDATION_API as string,
   };
 };
 export const envVars = loadEnvVariables();
