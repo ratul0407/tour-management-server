@@ -12,6 +12,8 @@ export interface ITour {
   costFrom?: number;
   startDate?: Date;
   endDate?: Date;
+  departureLocation?: Date;
+  arrivalLocation?: Date;
   included?: string[];
   excluded?: string[];
   amenities?: string[];
