@@ -1,5 +1,8 @@
 import { ISSLCommerz } from "./sslCommerz.interface";
 
-const sslPaymentInit = (payload: Partial<ISSLCommerz>) => {
-  const data = {};
+export const sslPaymentInit = (payload: Partial<ISSLCommerz>) => {
+  const data = {
+    payment: "string",
+  };
+  return data;
 };
