@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import AppError from "../../errorHelpers/appError";
 import { IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
@@ -57,7 +58,7 @@ const resetPassword = async (
     throw new AppError(httpStatus.UNAUTHORIZED, "Old password does not match");
   }
 
-  user?.password = await bcryptjs.hash(
+  user!.password = await bcryptjs.hash(
     newPassword,
     Number(envVars.BCRYPT_SALT_ROUND)
   );
