@@ -17,11 +17,27 @@ const successPayment = catchAsync(
 );
 
 const failPayment = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.query as Record<string, string>;
+    const result = await PaymentService.failPayment(query);
+    if (!result.success) {
+      res.redirect(
+        `${envVars.SSL_FAIL_FRONTEND_URL}?transactionId=${query.transactionId}&message=${result.message}&amount=${query.amount}&success=${query.status}`
+      );
+    }
+  }
 );
 
 const cancelPayment = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.query as Record<string, string>;
+    const result = await PaymentService.cancelPayment(query);
+    if (!result.success) {
+      res.redirect(
+        `${envVars.SSL_CANCEL_FRONTEND_URL}?transactionId=${query.transactionId}&message=${result.message}&amount=${query.amount}&success=${query.status}`
+      );
+    }
+  }
 );
 
 export const PaymentController = {
@@ -29,3 +45,7 @@ export const PaymentController = {
   failPayment,
   cancelPayment,
 };
+
+//http://localhost:5173/api/v1/payment/fail?transactionId=tran_1754211828405_690&message=Payment%20Failed&amount=6800&success=Fail
+
+//http://localhost:5173/api/v1/payment/cancel?transactionId=tran_1754211870289_710&message=Payment%20Cancelled&amount=6800&success=cancel
