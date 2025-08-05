@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { PaymentService } from "./payment.service";
 import { envVars } from "../../config/env";
+import { sendResponse } from "../../utils/sendResponse";
 
 const successPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -40,12 +41,21 @@ const cancelPayment = catchAsync(
   }
 );
 
+const initPayment = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const bookingId = req.params.bookingId;
+    const result = await PaymentService.initPayment(bookingId);
+    sendResponse(res, {
+      data: result,
+      statusCode: 201,
+      message: "Payment successful",
+      success: true,
+    });
+  }
+);
 export const PaymentController = {
   successPayment,
   failPayment,
   cancelPayment,
+  initPayment,
 };
-
-//http://localhost:5173/api/v1/payment/fail?transactionId=tran_1754211828405_690&message=Payment%20Failed&amount=6800&success=Fail
-
-//http://localhost:5173/api/v1/payment/cancel?transactionId=tran_1754211870289_710&message=Payment%20Cancelled&amount=6800&success=cancel
