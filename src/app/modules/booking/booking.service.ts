@@ -9,6 +9,7 @@ import { PAYMENT_STATUS } from "../payment/payment.interface";
 import { Tour } from "../tour/tour.model";
 import { SSLService } from "../../sslCommerz/sslCommerz.service";
 import { ISSLCommerz } from "../../sslCommerz/sslCommerz.interface";
+import { JwtPayload } from "jsonwebtoken";
 
 const getTransactionId = () => {
   return `tran_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -42,6 +43,15 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
       ],
       { session }
     );
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $push: { bookings: booking[0]._id },
+      },
+      { session }
+    );
+    console.log(updatedUser);
     const payment = await Payment.create(
       [
         {
@@ -78,7 +88,6 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
       transactionId: transactionId,
     };
     const sslPayment = await SSLService.sslPaymentInit(sslPayload);
-    console.log(sslPayment);
     await session.commitTransaction(); // transaction
     session.endSession();
     return {
@@ -93,10 +102,14 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
   }
 };
 
+const getUserBookings = async (token: JwtPayload) => {
+  const { userId } = token;
+};
 const getAllBookings = async () => {
   return {};
 };
 export const bookingService = {
   createBooking,
   getAllBookings,
+  getUserBookings,
 };

@@ -50,6 +50,9 @@ const userSchema = new Schema<IUser>(
     },
     isVerified: { type: Boolean, default: false },
     auths: [authProviderSchema],
+    bookings: {
+      type: [Schema.Types.ObjectId],
+    },
   },
   {
     timestamps: true,
