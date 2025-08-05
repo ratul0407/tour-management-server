@@ -10,6 +10,7 @@ import { Tour } from "../tour/tour.model";
 import { SSLService } from "../../sslCommerz/sslCommerz.service";
 import { ISSLCommerz } from "../../sslCommerz/sslCommerz.interface";
 import { JwtPayload } from "jsonwebtoken";
+import { QueryBuilder } from "../../utils/queryBuilder";
 
 const getTransactionId = () => {
   return `tran_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -102,8 +103,26 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
   }
 };
 
-const getUserBookings = async (token: JwtPayload) => {
+const getUserBookings = async (
+  token: JwtPayload,
+  query: Record<string, string>
+) => {
   const { userId } = token;
+  const user = await User.findOne({ _id: userId });
+  const queryBuilder = await new QueryBuilder(
+    Booking.find({ _id: { $in: user?.bookings } }),
+    query
+  );
+  const bookings = await queryBuilder.filter().sort().fields().paginate();
+  const [data, meta] = await Promise.all([
+    bookings.build(),
+    bookings.getMeta(),
+  ]);
+
+  return {
+    meta,
+    data,
+  };
 };
 const getAllBookings = async () => {
   return {};
