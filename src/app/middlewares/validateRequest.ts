@@ -6,6 +6,8 @@ export const validateRequest =
   async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
     try {
+      console.log(req.body);
+      req.body = JSON.parse(req.body?.data) || req.body;
       req.body = await zodSchema.parseAsync(req.body);
       next();
     } catch (error) {
