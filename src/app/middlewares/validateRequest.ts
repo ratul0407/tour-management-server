@@ -7,7 +7,9 @@ export const validateRequest =
     console.log(req.body);
     try {
       console.log(req.body);
-      req.body = JSON.parse(req.body?.data) || req.body;
+      if (req.body?.data) {
+        req.body = JSON.parse(req.body.data);
+      }
       req.body = await zodSchema.parseAsync(req.body);
       next();
     } catch (error) {

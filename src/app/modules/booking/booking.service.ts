@@ -11,10 +11,8 @@ import { SSLService } from "../../sslCommerz/sslCommerz.service";
 import { ISSLCommerz } from "../../sslCommerz/sslCommerz.interface";
 import { JwtPayload } from "jsonwebtoken";
 import { QueryBuilder } from "../../utils/queryBuilder";
+import { getTransactionId } from "../../utils/getTransactionId";
 
-const getTransactionId = () => {
-  return `tran_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-};
 const createBooking = async (payload: Partial<IBooking>, userId: string) => {
   const transactionId = getTransactionId();
   const session = await Booking.startSession();

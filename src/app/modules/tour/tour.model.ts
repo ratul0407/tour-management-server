@@ -30,6 +30,7 @@ const tourSchema = new Schema<ITour>(
     minAge: { type: Number },
     division: { type: Schema.Types.ObjectId, ref: "Division" },
     tourType: { type: Schema.Types.ObjectId, ref: "TourType", required: true },
+    deleteImages: { type: [String] },
   },
   {
     timestamps: true,

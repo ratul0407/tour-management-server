@@ -98,12 +98,12 @@ const logOut = catchAsync(
   }
 );
 
-const resetPassword = catchAsync(
+const changePassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user;
     const newPassword = req.body.password;
     const oldPassword = req.body.oldPassword;
-    await AuthServices.resetPassword(
+    await AuthServices.changePassword(
       oldPassword,
       newPassword,
       decodedToken as JwtPayload
@@ -134,10 +134,25 @@ const googleCallBack = catchAsync(
     res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
   }
 );
+
+const setPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { userId } = req.user as JwtPayload;
+    const { password } = req.body;
+    const result = await AuthServices.setPassword(userId, password);
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "User's password updated successfully!",
+      data: result,
+    });
+  }
+);
 export const authControllers = {
   credentialsLogin,
   getNewAccessToken,
   logOut,
-  resetPassword,
+  changePassword,
   googleCallBack,
+  setPassword,
 };
