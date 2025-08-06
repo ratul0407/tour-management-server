@@ -33,9 +33,16 @@ router.get(
   authControllers.googleCallBack
 );
 
+router.post("/reset-password", checkAuth(...Object.values(Role)));
 router.post(
   "/set-password",
   checkAuth(...Object.values(Role)),
   authControllers.setPassword
+);
+
+router.post(
+  "/forget-password",
+  checkAuth(...Object.values(Role)),
+  authControllers.forgetPassword
 );
 export const AuthRoutes = router;

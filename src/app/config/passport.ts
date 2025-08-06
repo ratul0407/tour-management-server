@@ -81,6 +81,7 @@ passport.use(
         }
 
         let isUserExists = await User.findOne({ email });
+
         if (!isUserExists) {
           isUserExists = await User.create({
             email,
