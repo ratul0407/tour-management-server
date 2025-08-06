@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import AppError from "../../errorHelpers/appError";
-import { IUser } from "../user/user.interface";
+import { IAuthProvider, IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
@@ -43,7 +43,7 @@ const getNewAccessToken = async (refreshToken: string) => {
   return { accessToken: newAccessToken };
 };
 
-const resetPassword = async (
+const changePassword = async (
   oldPassword: string,
   newPassword: string,
   decodedToken: JwtPayload
@@ -65,8 +65,39 @@ const resetPassword = async (
 
   user?.save();
 };
+
+const setPassword = async (userId: string, plainPassword: string) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User does not exist");
+  }
+  if (
+    user.password &&
+    user.auths.some((providerObj) => providerObj.provider === "google")
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You have already set your password, now you can change your password from your profile"
+    );
+  }
+
+  const hashedPassword = await bcryptjs.hash(
+    plainPassword,
+    Number(envVars.BCRYPT_SALT_ROUND)
+  );
+
+  const auths: IAuthProvider[] = [
+    ...user.auths,
+    { provider: "credentials", providerId: user.email },
+  ];
+  user.password = hashedPassword;
+  user.auths = auths;
+
+  await user.save();
+};
 export const AuthServices = {
   credentialsLogin,
   getNewAccessToken,
-  resetPassword,
+  changePassword,
+  setPassword,
 };

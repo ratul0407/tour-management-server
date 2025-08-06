@@ -24,6 +24,7 @@ export const globalErrorHandler = async (
     );
     await Promise.all(imageUrls.map((img) => deleteImgFromCloudinary(img)));
   }
+
   let statusCode = 500;
   let message = `Something went wrong!`;
   let errorSources: any = [];
