@@ -9,6 +9,8 @@ import { User } from "../modules/user/user.model";
 import { IsActive, Role } from "../modules/user/user.interface";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcryptjs from "bcryptjs";
+import AppError from "../errorHelpers/appError";
+import httpStatus from "http-status-codes";
 passport.use(
   new LocalStrategy(
     {
@@ -33,7 +35,7 @@ passport.use(
           done(" User is not verified");
         }
         if (isUserExists.isDeleted) {
-          done("User is deleted");
+          throw new AppError(httpStatus.BAD_REQUEST, "User is deleted");
         }
         const isGoogleAuthenticated = isUserExists.auths.some(
           (providerObjects) => providerObjects.provider === "google"
@@ -78,9 +80,10 @@ passport.use(
           return done(null, false, { message: "No email Found" });
         }
 
-        let user = await User.findOne({ email });
-        if (!user) {
-          user = await User.create({
+        let isUserExists = await User.findOne({ email });
+
+        if (!isUserExists) {
+          isUserExists = await User.create({
             email,
             name: profile.displayName,
             picture: profile.photos?.[0].value,
@@ -94,7 +97,26 @@ passport.use(
             ],
           });
         }
-        return done(null, user, { message: "User created successfully" });
+
+        if (
+          isUserExists &&
+          (isUserExists.isActive === IsActive.BLOCKED ||
+            isUserExists.isActive === IsActive.INACTIVE)
+        ) {
+          return done(null, false, {
+            message: `User is ${isUserExists.isActive}`,
+          });
+        }
+
+        if (isUserExists && !isUserExists.isVerified) {
+          return done(null, false, { message: "User is not verified" });
+        }
+        if (isUserExists && isUserExists.isDeleted) {
+          return done(null, false, { message: "User is deleted" });
+        }
+        return done(null, isUserExists, {
+          message: "User created successfully",
+        });
       } catch (error) {
         console.log("Google strategy error", error);
         return done(error);
