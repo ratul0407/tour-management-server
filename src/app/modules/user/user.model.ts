@@ -41,7 +41,7 @@ const userSchema = new Schema<IUser>(
       type: String,
     },
     isDeleted: {
-      type: String,
+      type: Boolean,
       default: false,
     },
     isActive: {
