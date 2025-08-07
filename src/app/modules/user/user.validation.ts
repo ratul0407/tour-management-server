@@ -36,7 +36,7 @@ export const createZodSchema = z.object({
     .string({ invalid_type_error: "Address must be a string" })
     .max(200, { message: "Address cannot exceed 200 characters" })
     .optional(),
-  IsActive: z.boolean(),
+  IsActive: z.boolean().optional(),
 });
 
 export const updateZodSchema = z.object({

@@ -33,7 +33,11 @@ router.get(
   authControllers.googleCallBack
 );
 
-router.post("/reset-password", checkAuth(...Object.values(Role)));
+router.post(
+  "/reset-password",
+  checkAuth(...Object.values(Role)),
+  authControllers.resetPassword
+);
 router.post(
   "/set-password",
   checkAuth(...Object.values(Role)),
