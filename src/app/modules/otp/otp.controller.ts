@@ -2,15 +2,30 @@
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { OTPService } from "./otp.service";
+import { sendResponse } from "../../utils/sendResponse";
 
 const sendOTP = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await OTPService.sendOTP();
+    const { email, name } = req.body;
+    await OTPService.sendOTP(email, name);
+    sendResponse(res, {
+      success: true,
+      statusCode: 201,
+      message: "OTP sent successfully!",
+      data: null,
+    });
   }
 );
 const verifyOTP = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await OTPService.verifyOTP();
+    const { email, otp } = req.body;
+    await OTPService.verifyOTP(email, otp);
+    sendResponse(res, {
+      success: true,
+      statusCode: 201,
+      message: "OTP verified successfully!",
+      data: null,
+    });
   }
 );
 export const OTPController = {
