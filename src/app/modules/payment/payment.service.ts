@@ -57,16 +57,20 @@ const successPayment = async (query: Record<string, string>) => {
       pdfBuffer,
       "invoice"
     );
+
+    console.log(cloudinaryResult, "from line 61");
     if (!cloudinaryResult) {
       throw new AppError(401, "Error uploading pdf");
     }
-    await Payment.findByIdAndUpdate(
+    const setInvoice = await Payment.findByIdAndUpdate(
       updatedPayment._id,
       {
-        invoiceUrl: cloudinaryResult.secureUrl,
+        invoiceUrl: cloudinaryResult.secure_url,
       },
       { runValidators: true, session }
     );
+
+    console.log(setInvoice, "from line 70");
     await sendEmail({
       to: (updatedBooking.user as unknown as IUser).email,
       subject: "Payment Invoice",
