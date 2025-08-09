@@ -60,9 +60,13 @@ const successPayment = async (query: Record<string, string>) => {
     if (!cloudinaryResult) {
       throw new AppError(401, "Error uploading pdf");
     }
-    await Payment.findByIdAndUpdate(updatedPayment._id, {
-      invoiceUrl: cloudinaryResult.secureUrl,
-    });
+    await Payment.findByIdAndUpdate(
+      updatedPayment._id,
+      {
+        invoiceUrl: cloudinaryResult.secureUrl,
+      },
+      { runValidators: true, session }
+    );
     await sendEmail({
       to: (updatedBooking.user as unknown as IUser).email,
       subject: "Payment Invoice",
@@ -192,9 +196,21 @@ const initPayment = async (id: string) => {
     paymentUrl: sslPayment.GatewayPageURL,
   };
 };
+
+const getInvoiceDownloadUrl = async (id: string) => {
+  const payment = await Payment.findById(id).select("invoiceUrl");
+  if (!payment) {
+    throw new AppError(401, "Payment not found");
+  }
+  if (!payment.invoiceUrl) {
+    throw new AppError(401, "No invoice url found");
+  }
+  return payment.invoiceUrl;
+};
 export const PaymentService = {
   successPayment,
   failPayment,
   cancelPayment,
   initPayment,
+  getInvoiceDownloadUrl,
 };
