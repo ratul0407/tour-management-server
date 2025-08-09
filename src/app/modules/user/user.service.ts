@@ -53,17 +53,21 @@ const updateUser = async (
   payload: Partial<IUser>,
   decoded: JwtPayload
 ) => {
+  if (decoded.role === Role.USER || decoded.role === Role.GUIDE) {
+    if (userId !== decoded.userId)
+      throw new AppError(401, "you are not authorized");
+  }
+
   const isUserExists = await User.findById(userId);
   console.log(payload);
   if (!isUserExists) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
+  if (decoded.role === Role.ADMIN && isUserExists.role === Role.SUPER_ADMIN) {
+    throw new AppError(401, "You are not authorized");
+  }
   if (payload.role) {
     if (decoded.role === Role.USER || decoded.role === Role.GUIDE) {
-      throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
-    }
-
-    if (payload.role === Role.SUPER_ADMIN && decoded.role === Role.ADMIN) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
   }
@@ -92,9 +96,15 @@ const getMe = async (id: string) => {
   const user = await User.findById(id).select("-password");
   return { data: user };
 };
+
+const getSingleUser = async (id: string) => {
+  const user = await User.findById(id).select("-password");
+  return user;
+};
 export const userServices = {
   createUser,
   getAllUsers,
   updateUser,
   getMe,
+  getSingleUser,
 };
