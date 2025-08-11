@@ -4,6 +4,7 @@ import { envVars } from "../config/env";
 import { ISSLCommerz } from "./sslCommerz.interface";
 import AppError from "../errorHelpers/appError";
 import httpStatus from "http-status-codes";
+import { Payment } from "../modules/payment/payment.model";
 const sslPaymentInit = async (payload: Partial<ISSLCommerz>) => {
   try {
     const data = {
@@ -15,6 +16,7 @@ const sslPaymentInit = async (payload: Partial<ISSLCommerz>) => {
       success_url: `${envVars.SSL_SUCCESS_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=success`,
       fail_url: `${envVars.SSL_FAIL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=Fail`,
       cancel_url: `${envVars.SSL_CANCEL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=cancel`,
+      ipn_ur: envVars.SSL_IPN_URL,
       shipping_method: "N/A",
       product_name: "Appointment",
       product_category: "Service",
@@ -54,6 +56,24 @@ const sslPaymentInit = async (payload: Partial<ISSLCommerz>) => {
   }
 };
 
+const validatePayment = async (payload: any) => {
+  try {
+    const response = await axios({
+      method: "GET",
+      url: `${envVars.SSL_VALIDATION_API}?val_id=${payload.val_id}&store=${envVars.SSL_STORE_ID}&store_passwd=${envVars.SSL_STORE_PASSWORD}`,
+    });
+    console.log("ssl commerz validate api response", response.data);
+
+    await Payment.findOneAndUpdate(
+      { transactionId: payload.tran_id },
+      { paymentGatewayData: response.data },
+      { runValidators: true }
+    );
+  } catch (error: any) {
+    throw new AppError(401, `Payment validation error ${error.message}`);
+  }
+};
 export const SSLService = {
   sslPaymentInit,
+  validatePayment,
 };
