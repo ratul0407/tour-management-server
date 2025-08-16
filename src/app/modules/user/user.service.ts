@@ -25,7 +25,7 @@ const createUser = async (payload: Partial<IUser>) => {
     ...rest,
   });
   return {
-    user,
+    data: user,
   };
 };
 

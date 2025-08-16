@@ -18,7 +18,7 @@ const credentialsLogin = catchAsync(
 
     passport.authenticate("local", async (error: any, user: any, info: any) => {
       if (error) {
-        console.log("from errs");
+        console.log(error, "from errs");
         return next(new AppError(401, error));
       }
 
@@ -112,7 +112,7 @@ const googleCallBack = catchAsync(
     if (redirectTo.startsWith("/")) {
       redirectTo = redirectTo.slice(1);
     }
-    console.log(user);
+
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }

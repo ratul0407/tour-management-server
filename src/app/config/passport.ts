@@ -18,8 +18,10 @@ passport.use(
       passwordField: "password",
     },
     async (email: string, password: string, done) => {
+      console.log(email, password);
       try {
         const isUserExists = await User.findOne({ email });
+        console.log(isUserExists, "from line 23");
         if (!isUserExists) {
           return done("User does not exist");
         }
@@ -55,7 +57,6 @@ passport.use(
         }
         return done(null, isUserExists);
       } catch (error) {
-        console.log(error);
         done(error);
       }
     }
@@ -118,7 +119,6 @@ passport.use(
           message: "User created successfully",
         });
       } catch (error) {
-        console.log("Google strategy error", error);
         return done(error);
       }
     }
@@ -137,7 +137,6 @@ passport.deserializeUser(async (id: string, done) => {
     const user = await User.findById(id);
     done(null, user);
   } catch (error) {
-    console.log(error);
     done(error);
   }
 });

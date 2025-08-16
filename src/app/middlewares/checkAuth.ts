@@ -9,8 +9,8 @@ import { IsActive } from "../modules/user/user.interface";
 export const checkAuth =
   (...authRoles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
-    const accessToken = req.cookies.accessToken ;
-    console.log(accessToken);
+    const accessToken = req.cookies.accessToken;
+
     try {
       if (!accessToken) {
         throw new AppError(403, "Not token received");
@@ -20,7 +20,6 @@ export const checkAuth =
         accessToken,
         envVars.JWT_ACCESS_SECRET
       ) as JwtPayload;
-      console.log(verifiedToken);
 
       const isUserExists = await User.findOne({
         email: verifiedToken.email,

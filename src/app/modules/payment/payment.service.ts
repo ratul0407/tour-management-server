@@ -43,7 +43,7 @@ const successPayment = async (query: Record<string, string>) => {
     if (!updatedBooking) {
       throw new AppError(httpStatus.BAD_REQUEST, "Booking was not found");
     }
-    console.log(updatedPayment);
+
     const invoiceData: IInvoiceData = {
       bookingDate: updatedBooking.createdAt as Date,
       guestCount: updatedBooking.guestCount,
