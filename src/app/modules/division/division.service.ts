@@ -1,13 +1,17 @@
 import { deleteImgFromCloudinary } from "../../config/cloudinary.config";
+import AppError from "../../errorHelpers/appError";
 import { QueryBuilder } from "../../utils/queryBuilder";
 import { divisionSearchableFields } from "./division.constants";
 import { IDivision } from "./division.interface";
 import { Division } from "./division.model";
-
+import httpStatus from "http-status-codes";
 const createDivision = async (payload: IDivision) => {
   const existingDivision = await Division.findOne({ name: payload.name });
   if (existingDivision) {
-    throw new Error("A division with this name already exists.");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "A division with this name already exists."
+    );
   }
 
   const division = await Division.create(payload);

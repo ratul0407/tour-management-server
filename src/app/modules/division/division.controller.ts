@@ -10,7 +10,7 @@ const createDivision = catchAsync(async (req: Request, res: Response) => {
     ...req.body,
     thumbnail: req?.file?.path,
   };
-
+  console.log(req.body);
   const result = await DivisionService.createDivision(payload);
   sendResponse(res, {
     statusCode: 201,
